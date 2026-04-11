@@ -31,9 +31,8 @@ RUN touch /var/www/html/database/database.sqlite \
 RUN echo "log_errors = On" >> /usr/local/etc/php/php.ini \
     && echo "error_log = /dev/stderr" >> /usr/local/etc/php/php.ini
 
-RUN cp .env.example .env \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 80
