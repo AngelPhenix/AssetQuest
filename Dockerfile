@@ -1,35 +1,39 @@
 FROM php:8.2-apache
 
-# Installation des extensions PHP nécessaires pour Laravel
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
     libsqlite3-dev \
+    nodejs \
+    npm \
     && docker-php-ext-install zip pdo pdo_sqlite
 
-# Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Configuration Apache
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
     /etc/apache2/sites-available/*.conf
 RUN a2enmod rewrite
 
-# Copie du projet
 WORKDIR /var/www/html
 COPY . .
 
-# Installation des dépendances
 RUN composer install --no-dev --optimize-autoloader
+RUN npm install && npm run build
 
-# Permissions pour Laravel
 RUN chown -R www-data:www-data /var/www/html/storage \
     && chown -R www-data:www-data /var/www/html/bootstrap/cache
 
-# Créer la base SQLite
 RUN touch /var/www/html/database/database.sqlite \
     && chown www-data:www-data /var/www/html/database/database.sqlite
+
+RUN echo "log_errors = On" >> /usr/local/etc/php/php.ini \
+    && echo "error_log = /dev/stderr" >> /usr/local/etc/php/php.ini
+
+RUN cp .env.example .env \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
 EXPOSE 80
