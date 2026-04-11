@@ -29,7 +29,8 @@ RUN chown -R www-data:www-data /var/www/html/storage \
     && chown -R www-data:www-data /var/www/html/bootstrap/cache
 
 RUN touch /var/www/html/database/database.sqlite \
-    && chown www-data:www-data /var/www/html/database/database.sqlite
+    && chown -R www-data:www-data /var/www/html/database \
+    && chmod -R 775 /var/www/html/database
 
 RUN echo "log_errors = On" >> /usr/local/etc/php/php.ini \
     && echo "error_log = /dev/stderr" >> /usr/local/etc/php/php.ini
