@@ -21,8 +21,8 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader
 
-ENV APP_URL=https://game-heritage.onrender.com
-ENV ASSET_URL=https://game-heritage.onrender.com
+ENV APP_URL=https://game-heritage-94bj.onrender.com
+ENV ASSET_URL=https://game-heritage-94bj.onrender.com
 RUN npm install && npm run build
 
 RUN chown -R www-data:www-data /var/www/html/storage \
